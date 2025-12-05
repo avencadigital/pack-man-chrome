@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pack-Man Extension - Component Showcase</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 40px 20px;
+            line-height: 1.5;
+        }
+
+        body.light-mode {
+            background: #ffffff;
+            color: #24292f;
+        }
+
+        .showcase-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .showcase-header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        body.light-mode .showcase-header {
+            border-bottom-color: #d0d7de;
+        }
+
+        .showcase-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #58a6ff;
+        }
+
+        body.light-mode .showcase-title {
+            color: #0969da;
+        }
+
+        .showcase-subtitle {
+            font-size: 16px;
+            color: #8b949e;
+            margin-bottom: 20px;
+        }
+
+        body.light-mode .showcase-subtitle {
+            color: #57606a;
+        }
+
+        .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #c9d1d9;
+            transition: all 0.2s ease;
+        }
+
+        body.light-mode .theme-toggle {
+            background: #f6f8fa;
+            border-color: #d0d7de;
+            color: #24292f;
+        }
+
+        .theme-toggle:hover {
+            background: #30363d;
+            border-color: #8b949e;
+        }
+
+        body.light-mode .theme-toggle:hover {
+            background: #eaeef2;
+            border-color: #afb8c1;
+        }
+
+        .showcase-section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #f0f6fc;
+        }
+
+        body.light-mode .section-title {
+            color: #1f2328;
+        }
+
+        .section-description {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 24px;
+        }
+
+        body.light-mode .section-description {
+            color: #57606a;
+        }
+
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .component-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        body.light-mode .component-card {
+            background: #f6f8fa;
+            border-color: #d0d7de;
+        }
+
+        .component-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #8b949e;
+            margin-bottom: 12px;
+        }
+
+        body.light-mode .component-label {
+            color: #57606a;
+        }
+
+        .mock-repo-card {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        body.light-mode .mock-repo-card {
+            background: #ffffff;
+            border-color: #d0d7de;
+        }
+
+        .mock-repo-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mock-repo-icon {
+            width: 20px;
+            height: 20px;
+            background: #30363d;
+            border-radius: 4px;
+        }
+
+        body.light-mode .mock-repo-icon {
+            background: #d0d7de;
+        }
+
+        .mock-repo-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #58a6ff;
+        }
+
+        body.light-mode .mock-repo-name {
+            color: #0969da;
+        }
+
+        .mock-repo-description {
+            font-size: 13px;
+            color: #8b949e;
+            margin-bottom: 12px;
+        }
+
+        body.light-mode .mock-repo-description {
+            color: #57606a;
+        }
+
+        .code-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 12px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 12px;
+            color: #c9d1d9;
+            overflow-x: auto;
+        }
+
+        body.light-mode .code-block {
+            background: #f6f8fa;
+            border-color: #d0d7de;
+            color: #24292f;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="showcase-container">
+        <!-- Header -->
+        <div class="showcase-header">
+            <h1 class="showcase-title">Pack-Man Extension Component Showcase</h1>
+            <p class="showcase-subtitle">Visual reference for all extension components and states</p>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="theme-icon">🌙</span>
+                <span id="theme-text">Switch to Light Mode</span>
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div class="showcase-section">
+            <h2 class="section-title">Loading State</h2>
+            <p class="section-description">Displayed while analyzing repository dependencies</p>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-label">Loading Indicator</div>
+                    <div class="mock-repo-card">
+                        <div class="mock-repo-header">
+                            <div class="mock-repo-icon"></div>
+                            <span class="mock-repo-name">user/awesome-project</span>
+                        </div>
+                        <p class="mock-repo-description">A modern web application with React and TypeScript</p>
+                        <div class="repo-analyzer-container">
+                            <div class="repo-analyzer-loading">
+                                <span class="spinner"></span>
+                                <span class="loading-text">Analyzing...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success States - Badges -->
+        <div class="showcase-section">
+            <h2 class="section-title">Success States - Badges</h2>
+            <p class="section-description">Different badge combinations based on analysis results</p>
+            <div class="component-grid">
+                <!-- All Up-to-date -->
+                <div class="component-card">
+                    <div class="component-label">All Up-to-date (npm)</div>
+                    <div class="mock-repo-card">
+                        <div class="mock-repo-header">
+                            <div class="mock-repo-icon"></div>
+                            <span class="mock-repo-name">user/perfect-project</span>
+                        </div>
+                        <p class="mock-repo-description">All dependencies are up-to-date</p>
+                        <div class="repo-analyzer-container">
+                            <div class="repo-analyzer-badges">
+                                <span class="badge badge-file-type" title="package.json">📦 npm</span>
+                                <span class="badge badge-info" title="Total dependencies">15 packages</span>
+                                <span class="badge badge-success" title="Up-to-date dependencies">✅ 15 up-to-date</span>
+                                <span class="badge badge-health badge-health-good" title="Dependency health score">💚
+                                    100% Healthy</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mixed State (npm) -->
+                <div class="component-card">
+                    <div class="component-label">Mixed State (npm)</div>
+                    <div class="mock-repo-card">
+                        <div class="mock-repo-header">
+                            <div class="mock-repo-icon"></div>
+                            <span class="mock-repo-name">user/active-project</span>
+                        </div>
+                        <p class="mock-repo-description">Some dependencies need updates</p>
+                        <div class="repo-analyzer-container">
+                            <div class="repo-analyzer-badges">
+                                <span class="badge badge-file-type" title="package.json">📦 npm</span>
+                                <span class="badge badge-info" title="Total dependencies">28 packages</span>
+                                <span class="badge badge-success" title="Up-to-date dependencies">✅ 20 up-to-date</span>
+                                <span class="badge badge-warning" title="Outdated dependencies">⚠️ 7 outdated</span>
+                                <span class="badge badge-error" title="Packages with errors">❌ 1 errors</span>
+                                <span class="badge badge-health badge-health-fair" title="Dependency health score">💛
+                                    75% Fair</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Python Project -->
+                <div class="component-card">
+                    <div class="component-label">Python Project (pip)</div>
+                    <div class="mock-repo-card">
+                        <div class="mock-repo-header">
+                            <div class="mock-repo-icon"></div>
+                            <span class="mock-repo-name">user/python-api</span>
+                        </div>
+                        <p class="mock-repo-description">Flask API with multiple dependencies</p>
+                        <div class="repo-analyzer-container">
+                            <div class="repo-analyzer-badges">
+                                <span class="badge badge-file-type" title="requirements.txt">🐍 pip</span>
+                                <span class="badge badge-info" title="Total dependencies">12 packages</span>
+                                <span class="badge badge-success" title="Up-to-date dependencies">✅ 8 up-to-date</span>
+                                <span class="badge badge-warning" title="Outdated dependencies">⚠️ 4 outdated</span>
+                                <span class="badge badge-health badge-health-fair" title="Dependency health score">💛
+                                    67% Fair</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Flutter Project -->
+                <div class="component-card">
+                    <div class="component-label">Flutter Project (pub)</div>
+                    <div class="mock-repo-card">
+                        <div class="mock-repo-header">
+                            <div class="mock-repo-icon"></div>
+                            <span class="mock-repo-name">user/flutter-app</span>
+                        </div>
+                        <p class="mock-repo-description">Mobile app with Flutter framework</p>
+                        <div class="repo-analyzer-container">
+                            <div class="repo-analyzer-badges">
+                                <span class="badge badge-file-type" title="pubspec.yaml">🎯 pub</span>
+                                <span class="badge badge-info" title="Total dependencies">18 packages</span>
+                                <span class="badge badge-success" title="Up-to-date dependencies">✅ 10 up-to-date</span>
+                                <span class="badge badge-warning" title="Outdated dependencies">⚠️ 6 outdated</span>
+                                <span class="badge badge-error" title="Packages with errors">❌ 2 errors</span>
+                                <span class="badge badge-health badge-health-poor" title="Dependency health score">❤️
+                                    44% Needs attention</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Details Section -->
+        <div class="showcase-section">
+            <h2 class="section-title">Details Section (Expanded)</h2>
+            <p class="section-description">Expandable section showing outdated packages and errors</p>
+            <div class="component-grid full-width">
+                <div class="component-card">
+                    <div class="component-label">Outdated Packages with Details</div>
+                    <div class="mock-repo-card">
+                        <div class="mock-repo-header">
+                            <div class="mock-repo-icon"></div>
+                            <span class="mock-repo-name">user/legacy-project</span>
+                        </div>
+                        <p class="mock-repo-description">Project with several outdated dependencies</p>
+                        <div class="repo-analyzer-container">
+                            <div class="repo-analyzer-content" data-theme="packman">
+                                <div class="repo-analyzer-badges">
+                                    <span class="badge badge-file-type" title="package.json">📦 npm</span>
+                                    <span class="badge badge-info" title="Total dependencies">25 packages</span>
+                                    <span class="badge badge-success" title="Up-to-date dependencies">✅ 15
+                                        up-to-date</span>
+                                    <span class="badge badge-warning" title="Outdated dependencies">⚠️ 8 outdated</span>
+                                    <span class="badge badge-error" title="Packages with errors">❌ 2 errors</span>
+                                    <span class="badge badge-health badge-health-fair"
+                                        title="Dependency health score">💛 68% Fair</span>
+                                </div>
+                                <button class="repo-analyzer-toggle expanded" onclick="toggleDetails(this)">
+                                    <span class="toggle-icon">▲</span>
+                                    <span class="toggle-text">Hide details</span>
+                                </button>
+                                <div class="repo-analyzer-details" style="display: block;">
+                                    <div class="details-section">
+                                        <h4 class="details-title">⚠️ Outdated Packages</h4>
+                                        <ul class="package-list">
+                                            <li class="package-item">
+                                                <div class="package-header">
+                                                    <span class="package-name">react</span>
+                                                </div>
+                                                <div class="package-versions">
+                                                    <span class="version-current">17.0.2</span>
+                                                    <span class="version-arrow">→</span>
+                                                    <span class="version-latest">18.2.0</span>
+                                                </div>
+                                            </li>
+                                            <li class="package-item">
+                                                <div class="package-header">
+                                                    <span class="package-name">axios</span>
+                                                </div>
+                                                <div class="package-versions">
+                                                    <span class="version-current">0.27.2</span>
+                                                    <span class="version-arrow">→</span>
+                                                    <span class="version-latest">1.6.2</span>
+                                                </div>
+                                            </li>
+                                            <li class="package-item">
+                                                <div class="package-header">
+                                                    <span class="package-name">lodash</span>
+                                                </div>
+                                                <div class="package-versions">
+                                                    <span class="version-current">4.17.20</span>
+                                                    <span class="version-arrow">→</span>
+                                                    <span class="version-latest">4.17.21</span>
+                                                </div>
+                                            </li>
+                                            <li class="package-item">
+                                                <div class="package-header">
+                                                    <span class="package-name">typescript</span>
+                                                </div>
+                                                <div class="package-versions">
+                                                    <span class="version-current">4.9.5</span>
+                                                    <span class="version-arrow">→</span>
+                                                    <span class="version-latest">5.3.3</span>
+                                                </div>
+                                            </li>
+                                            <li class="package-item">
+                                                <div class="package-header">
+                                                    <span class="package-name">webpack</span>
+                                                </div>
+                                                <div class="package-versions">
+                                                    <span class="version-current">5.75.0</span>
+                                                    <span class="version-arrow">→</span>
+                                                    <span class="version-latest">5.89.0</span>
+                                                </div>
+                                            </li>
+                                            <li class="package-item-more">+3 more...</li>
+                                        </ul>
+                                    </div>
+                                    <div class="details-section">
+                                        <h4 class="details-title">❌ Packages with Errors</h4>
+                                        <ul class="package-list">
+                                            <li class="package-item">
+                                                <div class="package-header">
+                                                    <span class="package-name">unknown-package</span>
+                                                </div>
+                                                <div class="package-error">Package not found in registry</div>
+                                            </li>
+                                            <li class="package-item">
+                                                <div class="package-header">
+                                                    <span class="package-name">deprecated-lib</span>
+                                                </div>
+                                                <div class="package-error">Package has been deprecated</div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error States -->
+        <div class="showcase-section">
+            <h2 class="section-title">Error States</h2>
+            <p class="section-description">Different error scenarios with contextual help</p>
+            <div class="component-grid">
+                <!-- Authentication Error -->
+                <div class="component-card">
+                    <div class="component-label">Authentication Error</div>
+                    <div class="mock-repo-card">
+                        <div class="mock-repo-header">
+                            <div class="mock-repo-icon"></div>
+                            <span class="mock-repo-name">user/private-repo</span>
+                        </div>
+                        <p class="mock-repo-description">Private repository requiring authentication</p>
+                        <div class="repo-analyzer-container">
+                            <div class="repo-analyzer-error">
+                                <div class="error-header">
+                                    <span class="error-icon">🔒</span>
+                                    <span class="error-text">Private repository detected</span>
+                                </div>
+                                <div class="repo-analyzer-help">
+                                    <strong>Authentication required:</strong> Add a GitHub token with "repo" scope to
+                                    access private repositories.
+                                </div>
+                                <div class="error-actions">
+                                    <button class="error-action-btn">Configure Token</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rate Limit Error -->
+                <div class="component-card">
+                    <div class="component-label">Rate Limit Error</div>
+                    <div class="mock-repo-card">
+                        <div class="mock-repo-header">
+                            <div class="mock-repo-icon"></div>
+                            <span class="mock-repo-name">user/another-repo</span>
+                        </div>
+                        <p class="mock-repo-description">Too many requests without authentication</p>
+                        <div class="repo-analyzer-container">
+                            <div class="repo-analyzer-error">
+                                <div class="error-header">
+                                    <span class="error-icon">⏱️</span>
+                                    <span class="error-text">GitHub API rate limit exceeded</span>
+                                </div>
+                                <div class="repo-analyzer-help">
+                                    <strong>Tip:</strong> Add a GitHub token to increase your rate limit from 60 to
+                                    5,000 requests per hour.
+                                </div>
+                                <div class="error-actions">
+                                    <button class="error-action-btn">Add Token</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeout Error -->
+                <div class="component-card">
+                    <div class="component-label">Timeout Error</div>
+                    <div class="mock-repo-card">
+                        <div class="mock-repo-header">
+                            <div class="mock-repo-icon"></div>
+                            <span class="mock-repo-name">user/large-project</span>
+                        </div>
+                        <p class="mock-repo-description">Project with very large dependency file</p>
+                        <div class="repo-analyzer-container">
+                            <div class="repo-analyzer-error">
+                                <div class="error-header">
+                                    <span class="error-icon">⏱️</span>
+                                    <span class="error-text">Request timed out</span>
+                                </div>
+                                <div class="repo-analyzer-help">
+                                    The analysis took too long. This might be due to a slow connection or large
+                                    dependency file.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Error -->
+                <div class="component-card">
+                    <div class="component-label">API Connection Error</div>
+                    <div class="mock-repo-card">
+                        <div class="mock-repo-header">
+                            <div class="mock-repo-icon"></div>
+                            <span class="mock-repo-name">user/test-repo</span>
+                        </div>
+                        <p class="mock-repo-description">Unable to reach analysis service</p>
+                        <div class="repo-analyzer-container">
+                            <div class="repo-analyzer-error">
+                                <div class="error-header">
+                                    <span class="error-icon">🔌</span>
+                                    <span class="error-text">Pack-Man API is unavailable</span>
+                                </div>
+                                <div class="repo-analyzer-help">
+                                    Unable to reach the analysis service. Please try again in a moment.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Not Found Error -->
+                <div class="component-card">
+                    <div class="component-label">Not Found Error</div>
+                    <div class="mock-repo-card">
+                        <div class="mock-repo-header">
+                            <div class="mock-repo-icon"></div>
+                            <span class="mock-repo-name">user/empty-repo</span>
+                        </div>
+                        <p class="mock-repo-description">Repository without dependency files</p>
+                        <div class="repo-analyzer-container">
+                            <div class="repo-analyzer-error">
+                                <div class="error-header">
+                                    <span class="error-icon">🔍</span>
+                                    <span class="error-text">Repository or dependency file not found</span>
+                                </div>
+                                <div class="repo-analyzer-help">
+                                    This repository may not contain package.json, requirements.txt, or pubspec.yaml
+                                    files.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generic Error -->
+                <div class="component-card">
+                    <div class="component-label">Generic Error</div>
+                    <div class="mock-repo-card">
+                        <div class="mock-repo-header">
+                            <div class="mock-repo-icon"></div>
+                            <span class="mock-repo-name">user/problematic-repo</span>
+                        </div>
+                        <p class="mock-repo-description">Unexpected error occurred</p>
+                        <div class="repo-analyzer-container">
+                            <div class="repo-analyzer-error">
+                                <div class="error-header">
+                                    <span class="error-icon">❌</span>
+                                    <span class="error-text">Analysis failed</span>
+                                </div>
+                                <div class="repo-analyzer-help">
+                                    An unexpected error occurred. Try refreshing the page or check the browser console
+                                    for details.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Data State -->
+        <div class="showcase-section">
+            <h2 class="section-title">No Data State</h2>
+            <p class="section-description">Displayed when no dependency files are found</p>
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-label">No Dependency Files</div>
+                    <div class="mock-repo-card">
+                        <div class="mock-repo-header">
+                            <div class="mock-repo-icon"></div>
+                            <span class="mock-repo-name">user/docs-only</span>
+                        </div>
+                        <p class="mock-repo-description">Documentation repository without code</p>
+                        <div class="repo-analyzer-container">
+                            <div class="repo-analyzer-no-data">
+                                <span class="no-data-icon">📦</span>
+                                <span class="no-data-text">No dependency files found</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Component Reference -->
+        <div class="showcase-section">
+            <h2 class="section-title">Component Reference</h2>
+            <p class="section-description">CSS classes and structure for developers</p>
+            <div class="component-grid full-width">
+                <div class="component-card">
+                    <div class="component-label">HTML Structure</div>
+                    <div class="code-block">
+                        &lt;!-- Loading State --&gt;
+                        &lt;div class="repo-analyzer-loading"&gt;
+                        &lt;span class="spinner"&gt;&lt;/span&gt;
+                        &lt;span class="loading-text"&gt;Analyzing...&lt;/span&gt;
+                        &lt;/div&gt;
+
+                        &lt;!-- Success State with Badges --&gt;
+                        &lt;div class="repo-analyzer-badges"&gt;
+                        &lt;span class="badge badge-file-type"&gt;📦 npm&lt;/span&gt;
+                        &lt;span class="badge badge-info"&gt;28 packages&lt;/span&gt;
+                        &lt;span class="badge badge-success"&gt;✅ 20 up-to-date&lt;/span&gt;
+                        &lt;span class="badge badge-warning"&gt;⚠️ 7 outdated&lt;/span&gt;
+                        &lt;span class="badge badge-error"&gt;❌ 1 errors&lt;/span&gt;
+                        &lt;span class="badge badge-health badge-health-fair"&gt;💛 75% Fair&lt;/span&gt;
+                        &lt;/div&gt;
+
+                        &lt;!-- Error State --&gt;
+                        &lt;div class="repo-analyzer-error"&gt;
+                        &lt;div class="error-header"&gt;
+                        &lt;span class="error-icon"&gt;🔒&lt;/span&gt;
+                        &lt;span class="error-text"&gt;Private repository detected&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="repo-analyzer-help"&gt;
+                        &lt;strong&gt;Authentication required:&lt;/strong&gt; Add a GitHub token...
+                        &lt;/div&gt;
+                        &lt;div class="error-actions"&gt;
+                        &lt;button class="error-action-btn"&gt;Configure Token&lt;/button&gt;
+                        &lt;/div&gt;
+                        &lt;/div&gt;
+
+                        &lt;!-- No Data State --&gt;
+                        &lt;div class="repo-analyzer-no-data"&gt;
+                        &lt;span class="no-data-icon"&gt;📦&lt;/span&gt;
+                        &lt;span class="no-data-text"&gt;No dependency files found&lt;/span&gt;
+                        &lt;/div&gt;
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            const text = document.getElementById('theme-text');
+
+            body.classList.toggle('light-mode');
+
+            if (body.classList.contains('light-mode')) {
+                icon.textContent = '☀️';
+                text.textContent = 'Switch to Dark Mode';
+            } else {
+                icon.textContent = '🌙';
+                text.textContent = 'Switch to Light Mode';
+            }
+        }
+
+        function toggleDetails(button) {
+            const details = button.nextElementSibling;
+            const icon = button.querySelector('.toggle-icon');
+            const text = button.querySelector('.toggle-text');
+
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+                icon.textContent = '▲';
+                text.textContent = 'Hide details';
+                button.classList.add('expanded');
+            } else {
+                details.style.display = 'none';
+                icon.textContent = '▼';
+                text.textContent = 'Show details';
+                button.classList.remove('expanded');
+            }
+        }
+
+        // Prevent action buttons from doing anything in showcase
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.error-action-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    alert('This is a showcase. In the real extension, this would open the configuration popup.');
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+{
+  "manifest_version": 3,
+  "name": "Pack-Man Repository Analyzer",
+  "version": "1.3.0",
+  "description": "Analyze GitHub repositories with enhanced details and health scores",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://github.com/*",
+    "https://api.github.com/*",
+    "https://pack-man-sand.vercel.app/*",
+    "https://pack-man.tech/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://github.com/*?*tab=repositories*",
+        "https://github.com/*/repositories*",
+        "https://github.com/*?tab=repositories",
+        "https://github.com/*/repositories",
+        "https://github.com/*?*tab=repositories&*",
+        "https://github.com/orgs/*/repositories*",
+        "https://github.com/users/*/repositories*",
+        "https://github.com/*/*",
+        "https://github.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_title": "Pack-Man GitHub Extension",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/packman_light.svg",
+        "icons/packman_dark.svg"
+      ],
+      "matches": [
+        "https://github.com/*"
+      ]
+    }
+  ]
+}

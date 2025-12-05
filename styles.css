@@ -1,0 +1,744 @@
+/* ============================================================================
+   PACK-MAN CHROME EXTENSION - GitHub Native Style
+   ============================================================================ */
+
+/* ============================================================================
+   1. BASE VARIABLES & RESET
+   ============================================================================ */
+
+.pm-container {
+  --pm-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  --pm-font-mono: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
+
+  /* Light mode colors (GitHub Primer) */
+  --pm-bg-primary: #ffffff;
+  --pm-bg-secondary: #f6f8fa;
+  --pm-bg-tertiary: #f1f3f5;
+  --pm-border-default: #d0d7de;
+  --pm-border-muted: #d8dee4;
+
+  --pm-text-primary: #1f2328;
+  --pm-text-secondary: #656d76;
+  --pm-text-muted: #8c959f;
+
+  --pm-success-fg: #1a7f37;
+  --pm-success-bg: #dafbe1;
+  --pm-success-border: #4ac26b;
+
+  --pm-warning-fg: #9a6700;
+  --pm-warning-bg: #fff8c5;
+  --pm-warning-border: #d4a72c;
+
+  --pm-danger-fg: #cf222e;
+  --pm-danger-bg: #ffebe9;
+  --pm-danger-border: #ff8182;
+
+  --pm-accent-fg: #0969da;
+  --pm-accent-bg: #ddf4ff;
+  --pm-accent-border: #54aeff;
+
+  --pm-purple-fg: #8250df;
+  --pm-purple-bg: #fbefff;
+  --pm-purple-border: #c297ff;
+
+  font-family: var(--pm-font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ============================================================================
+   2. MAIN CONTAINER
+   ============================================================================ */
+
+.pm-container {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  background: var(--pm-bg-primary);
+  border: 1px solid var(--pm-border-default);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* ============================================================================
+   3. HEADER
+   ============================================================================ */
+
+.pm-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 12px 16px;
+  background: var(--pm-bg-secondary);
+  border-bottom: none;
+}
+
+.pm-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pm-text-primary);
+}
+
+.pm-header-icon {
+  font-size: 16px;
+}
+
+.pm-logo {
+  width: 20px;
+  height: 20px;
+}
+
+/* Light theme: show light logo */
+.pm-logo--light {
+  display: inline-block;
+}
+
+.pm-logo--dark {
+  display: none;
+}
+
+/* Dark theme: show dark logo */
+body.github-dark-mode .pm-logo--light,
+html[data-color-mode="dark"] .pm-logo--light {
+  display: none;
+}
+
+body.github-dark-mode .pm-logo--dark,
+html[data-color-mode="dark"] .pm-logo--dark {
+  display: inline-block;
+}
+
+.pm-header-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--pm-bg-secondary);
+  border-bottom: 1px solid var(--pm-border-default);
+}
+
+.pm-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--pm-purple-fg);
+  background: var(--pm-purple-bg);
+  border: 1px solid var(--pm-purple-border);
+  border-radius: 20px;
+}
+
+.pm-provider-icon {
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+}
+
+.pm-header-badge--npm {
+  color: #CB3837;
+  background: rgba(203, 56, 55, 0.1);
+  border-color: rgba(203, 56, 55, 0.3);
+}
+
+.pm-header-badge--pip {
+  color: #3776AB;
+  background: rgba(55, 118, 171, 0.1);
+  border-color: rgba(55, 118, 171, 0.3);
+}
+
+.pm-header-badge--pub {
+  color: #0175C2;
+  background: rgba(1, 117, 194, 0.1);
+  border-color: rgba(1, 117, 194, 0.3);
+}
+
+.pm-header-badge--branch {
+  color: var(--pm-success-fg);
+  background: var(--pm-success-bg);
+  border-color: var(--pm-success-border);
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   4. STATS ROW
+   ============================================================================ */
+
+.pm-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--pm-border-muted);
+}
+
+.pm-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 20px;
+  border: 1px solid;
+}
+
+.pm-stat-icon {
+  font-size: 12px;
+}
+
+.pm-stat--total {
+  color: var(--pm-accent-fg);
+  background: var(--pm-accent-bg);
+  border-color: var(--pm-accent-border);
+}
+
+.pm-stat--success {
+  color: var(--pm-success-fg);
+  background: var(--pm-success-bg);
+  border-color: var(--pm-success-border);
+}
+
+.pm-stat--warning {
+  color: var(--pm-warning-fg);
+  background: var(--pm-warning-bg);
+  border-color: var(--pm-warning-border);
+}
+
+.pm-stat--danger {
+  color: var(--pm-danger-fg);
+  background: var(--pm-danger-bg);
+  border-color: var(--pm-danger-border);
+}
+
+/* ============================================================================
+   5. HEALTH BAR
+   ============================================================================ */
+
+.pm-health {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--pm-border-muted);
+}
+
+.pm-health-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.pm-health-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--pm-text-secondary);
+}
+
+.pm-health-value {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pm-health-value--good {
+  color: var(--pm-success-fg);
+}
+
+.pm-health-value--fair {
+  color: var(--pm-warning-fg);
+}
+
+.pm-health-value--poor {
+  color: var(--pm-danger-fg);
+}
+
+.pm-health-bar {
+  height: 8px;
+  background: var(--pm-bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.pm-health-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.pm-health-fill--good {
+  background: var(--pm-success-border);
+}
+
+.pm-health-fill--fair {
+  background: var(--pm-warning-border);
+}
+
+.pm-health-fill--poor {
+  background: var(--pm-danger-border);
+}
+
+/* ============================================================================
+   6. TOGGLE BUTTON
+   ============================================================================ */
+
+.pm-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--pm-accent-fg);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--pm-border-muted);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.pm-toggle:hover {
+  background: var(--pm-bg-secondary);
+}
+
+.pm-toggle-icon {
+  font-size: 10px;
+  transition: transform 0.2s ease;
+}
+
+.pm-toggle.is-open .pm-toggle-icon {
+  transform: rotate(180deg);
+}
+
+/* ============================================================================
+   7. DETAILS SECTION
+   ============================================================================ */
+
+.pm-details {
+  display: none;
+  padding: 16px;
+  background: var(--pm-bg-secondary);
+}
+
+.pm-details.is-open {
+  display: block;
+}
+
+.pm-section {
+  margin-bottom: 16px;
+}
+
+.pm-section:last-child {
+  margin-bottom: 0;
+}
+
+.pm-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--pm-border-muted);
+}
+
+.pm-section-icon {
+  font-size: 14px;
+}
+
+.pm-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pm-text-primary);
+}
+
+.pm-section-count {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--pm-text-muted);
+}
+
+/* ============================================================================
+   8. PACKAGE LIST
+   ============================================================================ */
+
+.pm-packages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pm-packages--scrollable {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.pm-packages--scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pm-packages--scrollable::-webkit-scrollbar-track {
+  background: var(--pm-bg-tertiary);
+  border-radius: 3px;
+}
+
+.pm-packages--scrollable::-webkit-scrollbar-thumb {
+  background: var(--pm-border-default);
+  border-radius: 3px;
+}
+
+.pm-packages--scrollable::-webkit-scrollbar-thumb:hover {
+  background: var(--pm-text-muted);
+}
+
+.pm-package {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  background: var(--pm-bg-primary);
+  border: 1px solid var(--pm-border-muted);
+  border-radius: 6px;
+}
+
+.pm-package:last-child {
+  margin-bottom: 0;
+}
+
+.pm-package-name {
+  font-family: var(--pm-font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--pm-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.pm-package-error {
+  font-size: 11px;
+  color: var(--pm-danger-fg);
+  font-style: italic;
+}
+
+.pm-package-versions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--pm-font-mono);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.pm-version {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.pm-version--old {
+  color: var(--pm-danger-fg);
+  background: var(--pm-danger-bg);
+}
+
+.pm-version--new {
+  color: var(--pm-success-fg);
+  background: var(--pm-success-bg);
+}
+
+.pm-version-arrow {
+  color: var(--pm-text-muted);
+}
+
+.pm-package-more {
+  padding: 8px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--pm-text-muted);
+  font-style: italic;
+}
+
+/* ============================================================================
+   9. STATES: LOADING, ERROR, NO DATA
+   ============================================================================ */
+
+.pm-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.pm-state-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.pm-state-text {
+  font-size: 13px;
+  color: var(--pm-text-secondary);
+  max-width: 300px;
+}
+
+/* Loading */
+.pm-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+}
+
+.pm-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--pm-border-default);
+  border-top-color: var(--pm-accent-fg);
+  border-radius: 50%;
+  animation: pm-spin 0.8s linear infinite;
+}
+
+.pm-loading-text {
+  font-size: 13px;
+  color: var(--pm-text-secondary);
+}
+
+/* Error */
+.pm-error {
+  margin: 16px;
+  padding: 12px;
+  background: var(--pm-danger-bg);
+  border: 1px solid var(--pm-danger-border);
+  border-radius: 6px;
+}
+
+.pm-error-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.pm-error-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.pm-error-content {
+  flex: 1;
+}
+
+.pm-error-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pm-danger-fg);
+  margin-bottom: 4px;
+}
+
+.pm-error-message {
+  font-size: 12px;
+  color: var(--pm-danger-fg);
+  line-height: 1.5;
+}
+
+.pm-error-actions {
+  margin-top: 12px;
+}
+
+.pm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #ffffff;
+  background: var(--pm-danger-fg);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.pm-btn:hover {
+  opacity: 0.9;
+}
+
+/* ============================================================================
+   10. ANIMATIONS
+   ============================================================================ */
+
+@keyframes pm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pm-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.pm-fade-in {
+  animation: pm-fade-in 0.2s ease;
+}
+
+/* ============================================================================
+   11. DARK MODE
+   ============================================================================ */
+
+body.github-dark-mode .pm-container,
+html[data-color-mode="dark"] .pm-container {
+  --pm-bg-primary: #0d1117;
+  --pm-bg-secondary: #161b22;
+  --pm-bg-tertiary: #21262d;
+  --pm-border-default: #30363d;
+  --pm-border-muted: #21262d;
+
+  --pm-text-primary: #e6edf3;
+  --pm-text-secondary: #8b949e;
+  --pm-text-muted: #6e7681;
+
+  --pm-success-fg: #3fb950;
+  --pm-success-bg: rgba(46, 160, 67, 0.15);
+  --pm-success-border: rgba(63, 185, 80, 0.4);
+
+  --pm-warning-fg: #d29922;
+  --pm-warning-bg: rgba(187, 128, 9, 0.15);
+  --pm-warning-border: rgba(210, 153, 34, 0.4);
+
+  --pm-danger-fg: #f85149;
+  --pm-danger-bg: rgba(248, 81, 73, 0.15);
+  --pm-danger-border: rgba(248, 81, 73, 0.4);
+
+  --pm-accent-fg: #58a6ff;
+  --pm-accent-bg: rgba(56, 139, 253, 0.15);
+  --pm-accent-border: rgba(56, 139, 253, 0.4);
+
+  --pm-purple-fg: #a371f7;
+  --pm-purple-bg: rgba(163, 113, 247, 0.15);
+  --pm-purple-border: rgba(163, 113, 247, 0.4);
+}
+
+/* Fallback for prefers-color-scheme */
+@media (prefers-color-scheme: dark) {
+  body:not(.github-light-mode):not([data-color-mode="light"]) .pm-container {
+    --pm-bg-primary: #0d1117;
+    --pm-bg-secondary: #161b22;
+    --pm-bg-tertiary: #21262d;
+    --pm-border-default: #30363d;
+    --pm-border-muted: #21262d;
+
+    --pm-text-primary: #e6edf3;
+    --pm-text-secondary: #8b949e;
+    --pm-text-muted: #6e7681;
+
+    --pm-success-fg: #3fb950;
+    --pm-success-bg: rgba(46, 160, 67, 0.15);
+    --pm-success-border: rgba(63, 185, 80, 0.4);
+
+    --pm-warning-fg: #d29922;
+    --pm-warning-bg: rgba(187, 128, 9, 0.15);
+    --pm-warning-border: rgba(210, 153, 34, 0.4);
+
+    --pm-danger-fg: #f85149;
+    --pm-danger-bg: rgba(248, 81, 73, 0.15);
+    --pm-danger-border: rgba(248, 81, 73, 0.4);
+
+    --pm-accent-fg: #58a6ff;
+    --pm-accent-bg: rgba(56, 139, 253, 0.15);
+    --pm-accent-border: rgba(56, 139, 253, 0.4);
+
+    --pm-purple-fg: #a371f7;
+    --pm-purple-bg: rgba(163, 113, 247, 0.15);
+    --pm-purple-border: rgba(163, 113, 247, 0.4);
+  }
+}
+
+/* Force light mode */
+body.github-light-mode .pm-container,
+html[data-color-mode="light"] .pm-container {
+  --pm-bg-primary: #ffffff;
+  --pm-bg-secondary: #f6f8fa;
+  --pm-bg-tertiary: #f1f3f5;
+  --pm-border-default: #d0d7de;
+  --pm-border-muted: #d8dee4;
+
+  --pm-text-primary: #1f2328;
+  --pm-text-secondary: #656d76;
+  --pm-text-muted: #8c959f;
+
+  --pm-success-fg: #1a7f37;
+  --pm-success-bg: #dafbe1;
+  --pm-success-border: #4ac26b;
+
+  --pm-warning-fg: #9a6700;
+  --pm-warning-bg: #fff8c5;
+  --pm-warning-border: #d4a72c;
+
+  --pm-danger-fg: #cf222e;
+  --pm-danger-bg: #ffebe9;
+  --pm-danger-border: #ff8182;
+
+  --pm-accent-fg: #0969da;
+  --pm-accent-bg: #ddf4ff;
+  --pm-accent-border: #54aeff;
+
+  --pm-purple-fg: #8250df;
+  --pm-purple-bg: #fbefff;
+  --pm-purple-border: #c297ff;
+}
+
+/* ============================================================================
+   12. RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 500px) {
+  .pm-stats {
+    gap: 6px;
+  }
+
+  .pm-stat {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+
+  .pm-package {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .pm-package-versions {
+    width: 100%;
+  }
+}
+
+/* Hide old classes */
+.repo-analyzer-content:not(.pm-container),
+.repo-analyzer-badges,
+.badge,
+.repo-analyzer-toggle,
+.repo-analyzer-details,
+.repo-analyzer-loading,
+.repo-analyzer-error,
+.repo-analyzer-no-data {
+  display: none !important;
+}

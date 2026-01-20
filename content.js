@@ -439,6 +439,10 @@ class GitHubRepositoryAnalyzer {
     const errors = packages?.filter(p => p.status === 'error') || [];
     const hasIssues = outdated.length > 0 || errors.length > 0;
 
+    // Count by urgency
+    const urgencyCounts = this.countByUrgency(outdated);
+    const hasCritical = urgencyCounts.critical > 0 || urgencyCounts.high > 0;
+
     const logoLight = chrome.runtime.getURL('icons/packman_light.svg');
     const logoDark = chrome.runtime.getURL('icons/packman_dark.svg');
 
@@ -480,6 +484,12 @@ class GitHubRepositoryAnalyzer {
               <span class="pm-stat-icon">⚠️</span>
               <span>${summary.outdated} outdated</span>
             </span>
+            ${hasCritical ? `
+              <span class="pm-stat pm-stat--critical">
+                <span class="pm-stat-icon">🔴</span>
+                <span>${urgencyCounts.critical + urgencyCounts.high} need attention</span>
+              </span>
+            ` : ''}
           ` : ''}
           ${summary.errors > 0 ? `
             <span class="pm-stat pm-stat--danger">
@@ -520,6 +530,14 @@ class GitHubRepositoryAnalyzer {
   renderOutdatedSection(packages) {
     if (packages.length === 0) return '';
 
+    // Sort by urgency (critical first)
+    const urgencyOrder = { critical: 0, high: 1, medium: 2, low: 3, none: 4 };
+    const sorted = [...packages].sort((a, b) => {
+      const urgA = a.versionDiff?.urgency || 'low';
+      const urgB = b.versionDiff?.urgency || 'low';
+      return (urgencyOrder[urgA] ?? 4) - (urgencyOrder[urgB] ?? 4);
+    });
+
     return `
       <div class="pm-section">
         <div class="pm-section-header">
@@ -528,18 +546,48 @@ class GitHubRepositoryAnalyzer {
           <span class="pm-section-count">${packages.length}</span>
         </div>
         <ul class="pm-packages pm-packages--scrollable">
-          ${packages.map(pkg => `
-            <li class="pm-package">
-              <span class="pm-package-name">${pkg.name}</span>
-              <div class="pm-package-versions">
-                <span class="pm-version pm-version--old">${pkg.currentVersion}</span>
-                <span class="pm-version-arrow">→</span>
-                <span class="pm-version pm-version--new">${pkg.latestVersion}</span>
-              </div>
-            </li>
-          `).join('')}
+          ${sorted.map(pkg => this.renderOutdatedPackage(pkg)).join('')}
         </ul>
       </div>
+    `;
+  }
+
+  renderOutdatedPackage(pkg) {
+    const versionDiff = pkg.versionDiff;
+    const urgency = versionDiff?.urgency || 'low';
+    const hasBreaking = versionDiff?.hasBreakingChanges;
+    const majorsBehind = versionDiff?.majorsBehind || 0;
+
+    // Build version info text
+    let versionInfo = '';
+    if (majorsBehind > 0) {
+      versionInfo = `${majorsBehind} major${majorsBehind > 1 ? 's' : ''} behind`;
+    } else if (versionDiff?.minorsBehind > 0) {
+      versionInfo = `${versionDiff.minorsBehind} minor${versionDiff.minorsBehind > 1 ? 's' : ''} behind`;
+    }
+
+    // Deprecation warning
+    const deprecated = pkg.metadata?.deprecated;
+    const deprecatedHtml = deprecated
+      ? `<span class="pm-badge pm-badge--deprecated" title="${typeof deprecated === 'string' ? deprecated : 'This package is deprecated'}">deprecated</span>`
+      : '';
+
+    return `
+      <li class="pm-package pm-package--${urgency}">
+        <div class="pm-package-info">
+          <div class="pm-package-header">
+            <span class="pm-package-name">${pkg.name}</span>
+            ${hasBreaking ? '<span class="pm-badge pm-badge--breaking" title="Contains breaking changes">breaking</span>' : ''}
+            ${deprecatedHtml}
+          </div>
+          ${versionInfo ? `<span class="pm-package-meta">${versionInfo}</span>` : ''}
+        </div>
+        <div class="pm-package-versions">
+          <span class="pm-version pm-version--old">${pkg.currentVersion}</span>
+          <span class="pm-version-arrow">→</span>
+          <span class="pm-version pm-version--new">${pkg.latestVersion}</span>
+        </div>
+      </li>
     `;
   }
 
@@ -580,16 +628,40 @@ class GitHubRepositoryAnalyzer {
               <div class="pm-error-message">${config.message}</div>
             </div>
           </div>
-          ${config.action ? `
-            <div class="pm-error-actions">
-              <button class="pm-btn" onclick="chrome.runtime.openOptionsPage ? chrome.runtime.openOptionsPage() : window.open(chrome.runtime.getURL('popup.html'))">
+          <div class="pm-error-actions">
+            ${config.showRetry ? `
+              <button class="pm-btn pm-btn--secondary pm-retry-btn" type="button">
+                <span class="pm-btn-icon">🔄</span>
+                <span>Tentar Novamente</span>
+              </button>
+            ` : ''}
+            ${config.action ? `
+              <button class="pm-btn pm-config-btn" type="button">
                 ${config.action}
               </button>
-            </div>
-          ` : ''}
+            ` : ''}
+          </div>
         </div>
       </div>
     `;
+
+    // Setup retry button event listener
+    if (config.showRetry) {
+      const retryBtn = container.querySelector('.pm-retry-btn');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', () => this.handleRetry(container));
+      }
+    }
+
+    // Setup config button event listener
+    if (config.action) {
+      const configBtn = container.querySelector('.pm-config-btn');
+      if (configBtn) {
+        configBtn.addEventListener('click', () => {
+          chrome.runtime.openOptionsPage ? chrome.runtime.openOptionsPage() : window.open(chrome.runtime.getURL('popup.html'));
+        });
+      }
+    }
   }
 
   renderNoData(container, message) {
@@ -617,9 +689,53 @@ class GitHubRepositoryAnalyzer {
     });
   }
 
+  /**
+   * Handle retry button click
+   */
+  async handleRetry(container) {
+    const retryBtn = container.querySelector('.pm-retry-btn');
+    if (!retryBtn) return;
+
+    // Disable button and show loading state
+    retryBtn.disabled = true;
+    const originalContent = retryBtn.innerHTML;
+    retryBtn.innerHTML = `
+      <span class="pm-spinner"></span>
+      <span>Tentando...</span>
+    `;
+
+    // Extract repository info from current context
+    if (this.isIndividualRepositoryPage()) {
+      // Individual repository page
+      const pathMatch = window.location.pathname.match(/^\/([^/]+)\/([^/]+)/);
+      if (pathMatch) {
+        const repoName = `${pathMatch[1]}/${pathMatch[2]}`;
+        await this.requestAnalysis(container, repoName, this.currentBranch);
+      }
+    } else {
+      // Repository list - need to find the repo name from the container's parent
+      const repoCard = container.closest('[data-testid="repository-list-item"], .repo-list-item, .Box-row, li.col-12');
+      if (repoCard) {
+        const repoInfo = this.extractRepositoryInfo(repoCard);
+        if (repoInfo.name) {
+          await this.requestAnalysis(container, repoInfo.name, null);
+        }
+      }
+    }
+  }
+
   getHealthScore(summary) {
     if (summary.total === 0) return null;
     return Math.round(((summary.upToDate * 1) + (summary.outdated * 0.5)) / summary.total * 100);
+  }
+
+  countByUrgency(packages) {
+    const counts = { critical: 0, high: 0, medium: 0, low: 0, none: 0 };
+    packages.forEach(pkg => {
+      const urgency = pkg.versionDiff?.urgency || 'low';
+      counts[urgency] = (counts[urgency] || 0) + 1;
+    });
+    return counts;
   }
 
   getHealthClass(score) {
@@ -650,16 +766,48 @@ class GitHubRepositoryAnalyzer {
   }
 
   getErrorConfig(message, hasAuthError) {
+    // Determine if error is retryable (transient errors)
+    const isRetryable = message.includes('timeout') ||
+      message.includes('network') ||
+      message.includes('Extension error') ||
+      message.includes('No response') ||
+      message.includes('try again') ||
+      message.includes('API error');
+
     if (hasAuthError || message.includes('token') || message.includes('private')) {
-      return { icon: '🔒', title: 'Authentication Required', message: 'Add a GitHub token with "repo" scope.', action: 'Configure Token' };
+      return {
+        icon: '🔒',
+        title: 'Authentication Required',
+        message: 'Add a GitHub token with "repo" scope.',
+        action: 'Configure Token',
+        showRetry: false
+      };
     }
     if (message.includes('rate limit')) {
-      return { icon: '⏱️', title: 'Rate Limit Exceeded', message: 'Add a GitHub token to increase limits.', action: 'Add Token' };
+      return {
+        icon: '⏱️',
+        title: 'Rate Limit Exceeded',
+        message: 'Add a GitHub token to increase limits.',
+        action: 'Add Token',
+        showRetry: false
+      };
     }
     if (message.includes('not found') || message.includes('404')) {
-      return { icon: '🔍', title: 'Not Found', message: 'Dependency file not found.', action: null };
+      return {
+        icon: '🔍',
+        title: 'Not Found',
+        message: 'Dependency file not found.',
+        action: null,
+        showRetry: false
+      };
     }
-    return { icon: '❌', title: 'Error', message: message || 'An error occurred.', action: null };
+    return {
+      icon: '❌',
+      title: 'Error',
+      message: message || 'An error occurred.',
+      action: null,
+      showRetry: isRetryable
+    };
   }
 
   setupMutationObserver() {

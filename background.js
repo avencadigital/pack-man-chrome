@@ -52,7 +52,16 @@ class BackgroundService {
   async loadApiEndpoint() {
     return new Promise((resolve) => {
       chrome.storage.local.get('api_endpoint', (data) => {
-        if (data.api_endpoint && data.api_endpoint.trim()) {
+        // Check for chrome.runtime.lastError
+        if (chrome.runtime.lastError) {
+          console.warn('Background: Error loading API endpoint:', chrome.runtime.lastError);
+          this.packManApiEndpoint = this.defaultApiEndpoint;
+          resolve();
+          return;
+        }
+
+        // Ensure data is defined
+        if (data && data.api_endpoint && data.api_endpoint.trim()) {
           this.packManApiEndpoint = data.api_endpoint.trim();
           console.log('Background: Using custom API endpoint:', this.packManApiEndpoint);
         } else {
@@ -351,7 +360,7 @@ class BackgroundService {
    */
   async fetchDependencyFile(repoName, branch = null) {
     const tokenData = await new Promise(resolve => chrome.storage.local.get('github_token', resolve));
-    const token = tokenData.github_token;
+    const token = tokenData?.github_token;
 
     console.log('Background: Fetching dependency files for:', repoName, branch ? `(branch: ${branch})` : '(default branch)');
     console.log('Background: Token available:', !!token);

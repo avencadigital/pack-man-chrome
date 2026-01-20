@@ -29,10 +29,10 @@ class PopupManager {
 
     document.getElementById('save-token-btn').addEventListener('click', () => this.handleSaveToken());
     document.getElementById('remove-token-btn').addEventListener('click', () => this.handleRemoveToken());
-    
+
     document.getElementById('save-api-btn').addEventListener('click', () => this.handleSaveApiEndpoint());
     document.getElementById('reset-api-btn').addEventListener('click', () => this.handleResetApiEndpoint());
-    
+
     document.getElementById('bmac-btn').addEventListener('click', () => this.handleBuyMeACoffee());
   }
 
@@ -100,7 +100,12 @@ class PopupManager {
 
   loadToken() {
     chrome.storage.local.get('github_token', (data) => {
-      this.updateTokenDisplay(data.github_token);
+      if (chrome.runtime.lastError) {
+        console.warn('Error loading token:', chrome.runtime.lastError);
+        this.updateTokenDisplay(null);
+        return;
+      }
+      this.updateTokenDisplay(data?.github_token);
     });
   }
 
@@ -119,12 +124,12 @@ class PopupManager {
     const apiInput = document.getElementById('api-endpoint-input');
     const apiStatus = document.getElementById('api-status');
     const resetBtn = document.getElementById('reset-api-btn');
-    
+
     if (apiInput) {
       apiInput.value = endpoint;
       apiInput.placeholder = endpoint;
     }
-    
+
     if (isDefault) {
       apiStatus.textContent = 'Using default API endpoint';
       apiStatus.style.color = 'var(--muted-foreground)';
@@ -166,10 +171,10 @@ class PopupManager {
           action: 'setApiEndpoint',
           endpoint: endpoint
         });
-        
+
         apiStatus.textContent = 'API endpoint saved and validated successfully!';
         apiStatus.style.color = 'var(--success)';
-        
+
         // Reload to update display
         setTimeout(() => this.loadApiEndpoint(), 1000);
       } else {
@@ -196,7 +201,7 @@ class PopupManager {
       await chrome.runtime.sendMessage({ action: 'resetApiEndpoint' });
       apiStatus.textContent = 'Reset to default API endpoint';
       apiStatus.style.color = 'var(--success)';
-      
+
       // Reload to update display
       setTimeout(() => this.loadApiEndpoint(), 500);
     } catch (error) {

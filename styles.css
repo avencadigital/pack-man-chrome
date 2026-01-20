@@ -218,6 +218,13 @@ html[data-color-mode="dark"] .pm-logo--dark {
   border-color: var(--pm-danger-border);
 }
 
+.pm-stat--critical {
+  color: #ffffff;
+  background: var(--pm-danger-fg);
+  border-color: var(--pm-danger-fg);
+  font-weight: 600;
+}
+
 /* ============================================================================
    5. HEALTH BAR
    ============================================================================ */
@@ -410,8 +417,40 @@ html[data-color-mode="dark"] .pm-logo--dark {
   border-radius: 6px;
 }
 
+/* Urgency-based left border */
+.pm-package--critical {
+  border-left: 3px solid var(--pm-danger-fg);
+}
+
+.pm-package--high {
+  border-left: 3px solid #f85149;
+}
+
+.pm-package--medium {
+  border-left: 3px solid var(--pm-warning-fg);
+}
+
+.pm-package--low {
+  border-left: 3px solid var(--pm-success-fg);
+}
+
 .pm-package:last-child {
   margin-bottom: 0;
+}
+
+.pm-package-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pm-package-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .pm-package-name {
@@ -422,8 +461,32 @@ html[data-color-mode="dark"] .pm-logo--dark {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
-  min-width: 0;
+}
+
+.pm-package-meta {
+  font-size: 10px;
+  color: var(--pm-text-muted);
+}
+
+.pm-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.pm-badge--breaking {
+  color: #ffffff;
+  background: var(--pm-danger-fg);
+}
+
+.pm-badge--deprecated {
+  color: var(--pm-warning-fg);
+  background: var(--pm-warning-bg);
+  border: 1px solid var(--pm-warning-border);
 }
 
 .pm-package-error {
@@ -554,14 +617,18 @@ html[data-color-mode="dark"] .pm-logo--dark {
 }
 
 .pm-error-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-top: 12px;
+  flex-wrap: wrap;
 }
 
 .pm-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px 12px;
+  gap: 6px;
+  padding: 6px 12px;
   font-size: 12px;
   font-weight: 500;
   color: #ffffff;
@@ -569,11 +636,44 @@ html[data-color-mode="dark"] .pm-logo--dark {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  transition: all 0.15s ease;
 }
 
-.pm-btn:hover {
+.pm-btn:hover:not(:disabled) {
   opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.pm-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.pm-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pm-btn--secondary {
+  color: var(--pm-text-primary);
+  background: var(--pm-bg-primary);
+  border: 1px solid var(--pm-border-default);
+}
+
+.pm-btn--secondary:hover:not(:disabled) {
+  background: var(--pm-bg-secondary);
+  border-color: var(--pm-text-secondary);
+}
+
+.pm-btn-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Spinner inside button */
+.pm-btn .pm-spinner {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
 }
 
 /* ============================================================================

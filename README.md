@@ -100,47 +100,26 @@ Common causes:
 
 ## 🔄 Recent Updates
 
-### Version 1.2.0 (Latest) 🆕
-- **Support Button Added**:
-  - Added "Buy me a beer" button powered by Buy Me a Coffee
-  - Opens donation page in new tab
-  - Helps maintain and improve Pack-Man
-  - Custom styled button with beer emoji 🍺
+### [Version 1.4.0](RELEASE_NOTES/RELEASE_NOTES_v1.4.0.md) (Latest) 🆕
+- **Manual Retry Functionality**:
+  - Added intelligent "Try Again" button for transient errors
+  - Smart error detection (retryable vs permanent errors)
+  - Loading state with animated spinner during retry
+  - Preserves context (repository name, branch) for accurate retry
+  - Works on both individual repository pages and repository lists
+- **Enhanced Error Recovery**:
+  - Secondary button style for visual hierarchy
+  - Smooth hover effects with subtle elevation
+  - Disabled state with reduced opacity
+  - No page reload required
+- **Improved User Experience**:
+  - Instant recovery from transient failures
+  - Clear visual feedback during retry
+  - Reduces frustration from temporary errors
 
-### Version 1.1.0
-- **Configurable API Endpoint** (Open Source Support):
-  - Users can now set custom API endpoints for self-hosted instances
-  - Default: `https://pack-man-sand.vercel.app/api/analyze-packages`
-  - Built-in validation tests custom endpoints before saving
-  - Easy reset to default with one click
-  - Automatic cache clearing when API changes
-  - Perfect for organizations running private Pack-Man instances
-
-### Version 1.0.2
-- **Enhanced Cache Strategy**:
-  - Added separate error cache with shorter TTL (2 minutes vs 5 minutes)
-  - Implemented cache size limiting (max 100 entries)
-  - Added automatic cleanup for expired entries
-  - Prevents hammering failed requests
-- **Improved Error Handling**:
-  - Added 10-second timeout for all network requests
-  - Implemented retry logic with 2 attempts and 1s delay
-  - Better error detection for timeouts vs network errors
-  - More descriptive error messages
-- **Better Performance**:
-  - Multiple cleanup intervals (cache every 1min, errors every 30s)
-  - Size limit enforcement every 5 minutes
-  - Optimized memory usage
-- **Enhanced Logging**:
-  - Added JSDoc comments for better code documentation
-  - More detailed console logs for debugging
-  - Clear indicators for cache hits/misses
-
-### Version 1.0.1
-- Fixed authentication header format (changed from `token` to `Bearer`)
-- Improved error messages for private repository access
-- Enhanced debug logging for troubleshooting
-- Better visual feedback for authentication errors
+### Previous Versions
+- [Version 1.3.0](RELEASE_NOTES/RELEASE_NOTES_v1.3.0.md) - Enhanced Repository Analysis Display
+- [Version 1.2.0](RELEASE_NOTES/RELEASE_NOTES_v1.2.0.md) - Support Feature Added
 
 ## 📝 License
 

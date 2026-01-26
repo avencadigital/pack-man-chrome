@@ -37,6 +37,9 @@
   --pm-accent-bg: #ddf4ff;
   --pm-accent-border: #54aeff;
 
+  --pm-primary: #0969da;
+  --pm-primary-hover: #0860ca;
+
   --pm-purple-fg: #8250df;
   --pm-purple-bg: #fbefff;
   --pm-purple-border: #c297ff;
@@ -188,6 +191,47 @@ html[data-color-mode="dark"] .pm-logo--dark {
   font-weight: 500;
   border-radius: 20px;
   border: 1px solid;
+  position: relative;
+}
+
+/* Tooltip only for danger stat with data-tooltip attribute */
+.pm-stat--danger[data-tooltip] {
+  cursor: help;
+}
+
+/* Custom tooltip styling for better text wrapping */
+.pm-stat--danger[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  background: var(--pm-text-primary);
+  color: var(--pm-bg-primary);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  border-radius: 6px;
+  white-space: normal;
+  max-width: 200px;
+  width: max-content;
+  text-align: center;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.pm-stat--danger[data-tooltip]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--pm-text-primary);
+  z-index: 1000;
+  pointer-events: none;
 }
 
 .pm-stat-icon {
@@ -216,13 +260,6 @@ html[data-color-mode="dark"] .pm-logo--dark {
   color: var(--pm-danger-fg);
   background: var(--pm-danger-bg);
   border-color: var(--pm-danger-border);
-}
-
-.pm-stat--critical {
-  color: #ffffff;
-  background: var(--pm-danger-fg);
-  border-color: var(--pm-danger-fg);
-  font-weight: 600;
 }
 
 /* ============================================================================
@@ -412,6 +449,7 @@ html[data-color-mode="dark"] .pm-logo--dark {
   gap: 12px;
   padding: 8px 12px;
   margin-bottom: 4px;
+  min-height: 52px;
   background: var(--pm-bg-primary);
   border: 1px solid var(--pm-border-muted);
   border-radius: 6px;
@@ -446,6 +484,20 @@ html[data-color-mode="dark"] .pm-logo--dark {
   min-width: 0;
 }
 
+.pm-package-badges {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+  font-size: 0;
+}
+
+.pm-package-badges > * {
+  font-size: 10px;
+}
+
 .pm-package-header {
   display: flex;
   align-items: center;
@@ -461,6 +513,12 @@ html[data-color-mode="dark"] .pm-logo--dark {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 200px;
+  cursor: default;
+}
+
+.pm-package-name:hover {
+  color: var(--pm-accent-fg);
 }
 
 .pm-package-meta {
@@ -476,6 +534,7 @@ html[data-color-mode="dark"] .pm-logo--dark {
   font-weight: 500;
   border-radius: 10px;
   white-space: nowrap;
+  vertical-align: middle;
 }
 
 .pm-badge--breaking {
@@ -502,12 +561,22 @@ html[data-color-mode="dark"] .pm-logo--dark {
   font-family: var(--pm-font-mono);
   font-size: 11px;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .pm-version {
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
+  cursor: default;
+}
+
+.pm-version:hover {
+  opacity: 0.8;
 }
 
 .pm-version--old {
@@ -653,6 +722,18 @@ html[data-color-mode="dark"] .pm-logo--dark {
   cursor: not-allowed;
 }
 
+/* Button Variants */
+.pm-btn--primary {
+  color: var(--pm-bg-primary);
+  background: var(--pm-primary);
+  border: none;
+}
+
+.pm-btn--primary:hover:not(:disabled) {
+  background: var(--pm-primary-hover);
+  opacity: 1;
+}
+
 .pm-btn--secondary {
   color: var(--pm-text-primary);
   background: var(--pm-bg-primary);
@@ -667,6 +748,14 @@ html[data-color-mode="dark"] .pm-logo--dark {
 .pm-btn-icon {
   font-size: 14px;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+.pm-btn-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
 }
 
 /* Spinner inside button */
@@ -732,6 +821,9 @@ html[data-color-mode="dark"] .pm-container {
   --pm-accent-bg: rgba(56, 139, 253, 0.15);
   --pm-accent-border: rgba(56, 139, 253, 0.4);
 
+  --pm-primary: #58a6ff;
+  --pm-primary-hover: #79b8ff;
+
   --pm-purple-fg: #a371f7;
   --pm-purple-bg: rgba(163, 113, 247, 0.15);
   --pm-purple-border: rgba(163, 113, 247, 0.4);
@@ -765,6 +857,9 @@ html[data-color-mode="dark"] .pm-container {
     --pm-accent-fg: #58a6ff;
     --pm-accent-bg: rgba(56, 139, 253, 0.15);
     --pm-accent-border: rgba(56, 139, 253, 0.4);
+
+    --pm-primary: #58a6ff;
+    --pm-primary-hover: #79b8ff;
 
     --pm-purple-fg: #a371f7;
     --pm-purple-bg: rgba(163, 113, 247, 0.15);
@@ -828,6 +923,14 @@ html[data-color-mode="light"] .pm-container {
 
   .pm-package-versions {
     width: 100%;
+  }
+
+  .pm-version {
+    max-width: 120px;
+  }
+
+  .pm-package-name {
+    max-width: 150px;
   }
 }
 

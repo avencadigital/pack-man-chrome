@@ -75,75 +75,74 @@ class BackgroundService {
 
   async handleMessage(request, sender, sendResponse) {
     console.log('Background: Received message:', request);
+
     try {
-      switch (request.action) {
-        case 'analyzeRepository':
+      const handlers = {
+        analyzeRepository: async () => {
           console.log('Background: Analyzing repository:', request.repoName, 'branch:', request.branch || 'default');
           const result = await this.analyzeRepository(request.repoName, request.branch);
           console.log('Background: Analysis result:', result);
-          sendResponse({ success: true, data: result });
-          break;
-
-        case 'clearCache':
-          this.cache.clear();
-          this.errorCache.clear();
-          console.log('Background: Cache cleared (success + error caches)');
-          sendResponse({ success: true });
-          break;
-
-        case 'getCacheStats':
-          sendResponse({
-            success: true,
-            stats: {
-              size: this.cache.size,
-              errorSize: this.errorCache.size,
-              entries: Array.from(this.cache.keys()),
-              maxSize: this.maxCacheSize
-            }
-          });
-          break;
-
-        case 'validateToken':
+          return { success: true, data: result };
+        },
+        clearCache: async () => {
+          this.clearAllCaches();
+          return { success: true };
+        },
+        getCacheStats: async () => ({
+          success: true,
+          stats: this.getCacheStatistics()
+        }),
+        validateToken: async () => {
           const validationResult = await this.validateToken(request.token);
-          sendResponse({ success: true, data: validationResult });
-          break;
-
-        case 'getApiEndpoint':
-          sendResponse({
-            success: true,
-            endpoint: this.packManApiEndpoint,
-            isDefault: this.packManApiEndpoint === this.defaultApiEndpoint
-          });
-          break;
-
-        case 'setApiEndpoint':
+          return { success: true, data: validationResult };
+        },
+        getApiEndpoint: async () => ({
+          success: true,
+          endpoint: this.packManApiEndpoint,
+          isDefault: this.packManApiEndpoint === this.defaultApiEndpoint
+        }),
+        setApiEndpoint: async () => {
           await this.setApiEndpoint(request.endpoint);
-          sendResponse({ success: true });
-          break;
-
-        case 'resetApiEndpoint':
+          return { success: true };
+        },
+        resetApiEndpoint: async () => {
           await this.setApiEndpoint(this.defaultApiEndpoint);
-          sendResponse({ success: true });
-          break;
-
-        case 'validateApiEndpoint':
+          return { success: true };
+        },
+        validateApiEndpoint: async () => {
           const apiValidation = await this.validateApiEndpoint(request.endpoint);
-          sendResponse({ success: true, data: apiValidation });
-          break;
+          return { success: true, data: apiValidation };
+        },
+        ping: async () => ({ success: true, alive: true })
+      };
 
-        case 'ping':
-          // Lightweight ping to check if service worker is alive
-          sendResponse({ success: true, alive: true });
-          break;
-
-        default:
-          sendResponse({ success: false, error: 'Unknown action' });
+      const handler = handlers[request.action];
+      if (handler) {
+        const response = await handler();
+        sendResponse(response);
+      } else {
+        sendResponse({ success: false, error: 'Unknown action' });
       }
     } catch (error) {
       console.error('Background: Error in background script:', error);
       console.error('Background: Stack trace:', error.stack);
       sendResponse({ success: false, error: error.message });
     }
+  }
+
+  clearAllCaches() {
+    this.cache.clear();
+    this.errorCache.clear();
+    console.log('Background: Cache cleared (success + error caches)');
+  }
+
+  getCacheStatistics() {
+    return {
+      size: this.cache.size,
+      errorSize: this.errorCache.size,
+      entries: Array.from(this.cache.keys()),
+      maxSize: this.maxCacheSize
+    };
   }
 
   /**

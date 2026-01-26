@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Pack-Man Repository Analyzer",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Analyze GitHub repositories with enhanced details, urgency indicators, and health scores",
   "permissions": [
     "activeTab",

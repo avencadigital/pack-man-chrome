@@ -32,9 +32,12 @@ To analyze private repositories and increase API rate limits, you need to config
 ### Configuring the Token in the Extension
 
 1. Click the Pack-Man extension icon in your browser toolbar
-2. Paste your GitHub token in the input field
+2. Click "Generate one here →" link (opens GitHub token creation page with pre-filled settings)
+   - OR manually paste your existing token in the input field
 3. Click "Save Token"
 4. The extension will validate the token and display your GitHub username if successful
+
+**Quick Link**: The extension popup includes a direct link to generate a token with the correct permissions automatically configured.
 
 ## 🎯 Features
 
@@ -100,24 +103,32 @@ Common causes:
 
 ## 🔄 Recent Updates
 
-### [Version 1.4.0](RELEASE_NOTES/RELEASE_NOTES_v1.4.0.md) (Latest) 🆕
-- **Manual Retry Functionality**:
-  - Added intelligent "Try Again" button for transient errors
-  - Smart error detection (retryable vs permanent errors)
-  - Loading state with animated spinner during retry
-  - Preserves context (repository name, branch) for accurate retry
-  - Works on both individual repository pages and repository lists
-- **Enhanced Error Recovery**:
-  - Secondary button style for visual hierarchy
-  - Smooth hover effects with subtle elevation
-  - Disabled state with reduced opacity
-  - No page reload required
-- **Improved User Experience**:
-  - Instant recovery from transient failures
-  - Clear visual feedback during retry
-  - Reduces frustration from temporary errors
+### [Version 1.5.0](RELEASE_NOTES/RELEASE_NOTES_v1.5.0.md) (Latest) 🆕
+- **UI/UX Refinements**:
+  - Improved package display with scoped package support
+  - Enhanced badge positioning above package names
+  - Added tooltips for package names and versions
+  - Ellipsis handling for long text
+- **Critical Package Indicator Redesign**:
+  - Changed to danger-styled outline badge
+  - Added informative tooltip with urgency breakdown
+  - Better visual clarity with ❌ icon
+- **Retry Button Improvements**:
+  - Professional SVG icon instead of emoji
+  - Primary button style for better visibility
+  - Extracted reusable loading state method
+- **Popup UI Refinements**:
+  - Added "Generate one here →" token help link
+  - Simplified cache section layout
+  - Fixed alignment and spacing issues
+- **Code Architecture Improvements**:
+  - Refactored background service with object-based handler pattern
+  - Added UIHelper utility class for consistent UI manipulation
+  - Improved package parsing logic with helper functions
+  - Better code organization and maintainability
 
 ### Previous Versions
+- [Version 1.4.0](RELEASE_NOTES/RELEASE_NOTES_v1.4.0.md) - Enhanced Error Recovery & Manual Retry
 - [Version 1.3.0](RELEASE_NOTES/RELEASE_NOTES_v1.3.0.md) - Enhanced Repository Analysis Display
 - [Version 1.2.0](RELEASE_NOTES/RELEASE_NOTES_v1.2.0.md) - Support Feature Added
 

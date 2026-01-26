@@ -485,9 +485,9 @@ class GitHubRepositoryAnalyzer {
               <span>${summary.outdated} outdated</span>
             </span>
             ${hasCritical ? `
-              <span class="pm-stat pm-stat--critical">
-                <span class="pm-stat-icon">🔴</span>
-                <span>${urgencyCounts.critical + urgencyCounts.high} need attention</span>
+              <span class="pm-stat pm-stat--danger" data-tooltip="${urgencyCounts.critical > 0 ? urgencyCounts.critical + ' critical' : ''}${urgencyCounts.critical > 0 && urgencyCounts.high > 0 ? ' + ' : ''}${urgencyCounts.high > 0 ? urgencyCounts.high + ' high' : ''} urgency packages (major updates or breaking changes)">
+                <span class="pm-stat-icon">❌</span>
+                <span>${urgencyCounts.critical + urgencyCounts.high} critical</span>
               </span>
             ` : ''}
           ` : ''}
@@ -568,24 +568,103 @@ class GitHubRepositoryAnalyzer {
 
     // Deprecation warning
     const deprecated = pkg.metadata?.deprecated;
-    const deprecatedHtml = deprecated
-      ? `<span class="pm-badge pm-badge--deprecated" title="${typeof deprecated === 'string' ? deprecated : 'This package is deprecated'}">deprecated</span>`
-      : '';
+
+    // Build badges HTML (always show above package name)
+    const hasBadges = hasBreaking || deprecated;
+    let badgesHtml = '';
+    if (hasBadges) {
+      badgesHtml = '<div class="pm-package-badges">';
+      if (hasBreaking) {
+        badgesHtml += '<span class="pm-badge pm-badge--breaking" title="Contains breaking changes">Breaking</span>';
+      }
+      if (deprecated) {
+        badgesHtml += `<span class="pm-badge pm-badge--deprecated" title="${typeof deprecated === 'string' ? deprecated : 'This package is deprecated'}">Deprecated</span>`;
+      }
+      badgesHtml += '</div>';
+    }
+
+    // Handle package name and version extraction
+    // Packages may come in formats like:
+    // - name: "npm:package@version" or "npm:package"
+    // - name: "@scope/package" (scoped packages)
+    // - currentVersion: "npm:package@version"
+    let displayName = pkg.name || '';
+    let currentVersion = pkg.currentVersion || '';
+    let latestVersion = pkg.latestVersion;
+
+    // Helper function to extract name and version from "npm:package@version" format
+    const parseNpmFormat = (str) => {
+      let value = str;
+
+      // Remove "npm:" prefix if present
+      if (value.startsWith('npm:')) {
+        value = value.substring(4);
+      }
+
+      // Handle scoped packages (@scope/package@version)
+      if (value.startsWith('@')) {
+        // Use lastIndexOf to find version separator (not the scope @)
+        const lastAtIndex = value.lastIndexOf('@');
+        if (lastAtIndex > 0) {
+          return {
+            name: value.substring(0, lastAtIndex),
+            version: value.substring(lastAtIndex + 1)
+          };
+        }
+        // No version found, just the scoped package name
+        return { name: value, version: null };
+      }
+
+      // Regular package: package@version
+      const atIndex = value.indexOf('@');
+      if (atIndex > 0) {
+        return {
+          name: value.substring(0, atIndex),
+          version: value.substring(atIndex + 1)
+        };
+      }
+
+      // No @ found, entire string is the package name
+      return { name: value, version: null };
+    };
+
+    // First, try to extract from displayName if it has "npm:" prefix
+    if (displayName.startsWith('npm:')) {
+      const parsed = parseNpmFormat(displayName);
+      displayName = parsed.name;
+      // Only override currentVersion if we extracted one and current is empty/same as original name
+      if (parsed.version && (!currentVersion || currentVersion === pkg.name)) {
+        currentVersion = parsed.version;
+      }
+    }
+
+    // If displayName is still empty, try to extract from currentVersion
+    if (!displayName && currentVersion) {
+      const parsed = parseNpmFormat(currentVersion);
+      displayName = parsed.name;
+      if (parsed.version) {
+        currentVersion = parsed.version;
+      }
+    }
+
+    // Fallback if still no name
+    if (!displayName) {
+      displayName = 'Unknown package';
+    }
 
     return `
       <li class="pm-package pm-package--${urgency}">
         <div class="pm-package-info">
+          ${badgesHtml}
           <div class="pm-package-header">
-            <span class="pm-package-name">${pkg.name}</span>
-            ${hasBreaking ? '<span class="pm-badge pm-badge--breaking" title="Contains breaking changes">breaking</span>' : ''}
-            ${deprecatedHtml}
+            <span class="pm-package-name" title="${displayName}">${displayName}</span>
           </div>
           ${versionInfo ? `<span class="pm-package-meta">${versionInfo}</span>` : ''}
         </div>
         <div class="pm-package-versions">
-          <span class="pm-version pm-version--old">${pkg.currentVersion}</span>
+          <span class="pm-version pm-version--old" title="${currentVersion}">${currentVersion}</span>
           <span class="pm-version-arrow">→</span>
-          <span class="pm-version pm-version--new">${pkg.latestVersion}</span>
+          <span class="pm-version pm-version--new" title="${latestVersion}">${latestVersion}</span>
         </div>
       </li>
     `;
@@ -630,9 +709,14 @@ class GitHubRepositoryAnalyzer {
           </div>
           <div class="pm-error-actions">
             ${config.showRetry ? `
-              <button class="pm-btn pm-btn--secondary pm-retry-btn" type="button">
-                <span class="pm-btn-icon">🔄</span>
-                <span>Tentar Novamente</span>
+              <button class="pm-btn pm-btn--primary pm-retry-btn" type="button">
+                <span class="pm-btn-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
+                    <path d="M21 3v5h-5"></path>
+                  </svg>
+                </span>
+                <span>Try Again</span>
               </button>
             ` : ''}
             ${config.action ? `
@@ -696,24 +780,16 @@ class GitHubRepositoryAnalyzer {
     const retryBtn = container.querySelector('.pm-retry-btn');
     if (!retryBtn) return;
 
-    // Disable button and show loading state
-    retryBtn.disabled = true;
-    const originalContent = retryBtn.innerHTML;
-    retryBtn.innerHTML = `
-      <span class="pm-spinner"></span>
-      <span>Tentando...</span>
-    `;
+    this.setRetryButtonLoading(retryBtn, true);
 
     // Extract repository info from current context
     if (this.isIndividualRepositoryPage()) {
-      // Individual repository page
       const pathMatch = window.location.pathname.match(/^\/([^/]+)\/([^/]+)/);
       if (pathMatch) {
         const repoName = `${pathMatch[1]}/${pathMatch[2]}`;
         await this.requestAnalysis(container, repoName, this.currentBranch);
       }
     } else {
-      // Repository list - need to find the repo name from the container's parent
       const repoCard = container.closest('[data-testid="repository-list-item"], .repo-list-item, .Box-row, li.col-12');
       if (repoCard) {
         const repoInfo = this.extractRepositoryInfo(repoCard);
@@ -721,6 +797,27 @@ class GitHubRepositoryAnalyzer {
           await this.requestAnalysis(container, repoInfo.name, null);
         }
       }
+    }
+  }
+
+  setRetryButtonLoading(button, isLoading) {
+    button.disabled = isLoading;
+
+    if (isLoading) {
+      button.innerHTML = `
+        <span class="pm-spinner"></span>
+        <span>Retrying...</span>
+      `;
+    } else {
+      button.innerHTML = `
+        <span class="pm-btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
+            <path d="M21 3v5h-5"></path>
+          </svg>
+        </span>
+        <span>Try Again</span>
+      `;
     }
   }
 

@@ -55,7 +55,7 @@
       padding-bottom: 1rem;
       border-bottom: 1px solid var(--border);
       display: flex;
-      align-items: start;
+      align-items: flex-start;
       gap: 0.75rem;
     }
 
@@ -63,6 +63,7 @@
       font-size: 1.25rem;
       font-weight: 700;
       margin: 0;
+      line-height: 1.25rem;
     }
 
     .card-description {
@@ -77,6 +78,7 @@
       width: 1.25rem;
       height: 1.25rem;
       flex-shrink: 0;
+      margin-top: 0.0625rem;
     }
 
     .logo-icon {
@@ -257,7 +259,6 @@
     .button-bmac {
       background-color: #FFDD00;
       color: #000000;
-      border: 2px solid #000000;
       font-family: 'Comic Sans MS', cursive, sans-serif;
       font-weight: 700;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -317,6 +318,18 @@
       width: 14px;
       height: 14px;
     }
+
+    .token-help-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .token-help-link:hover {
+      color: oklch(0.3 0 0);
+      text-decoration: underline;
+    }
   </style>
 </head>
 
@@ -351,24 +364,14 @@
       </div>
 
       <div class="label mt-4 mb-2">System Cache</div>
-      <div class="flex justify-between items-center gap-3">
-        <div class="flex items-center gap-2">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 7v10c0 2.21 1.79 4 4 4h8c2.21 0 4-1.79 4-4V7" />
-            <path d="M4 7c0-2.21 1.79-4 4-4h8c2.21 0 4 1.79 4 4" />
-            <path d="M9 11l3 3 3-3" />
-          </svg>
-          <span class="text-sm">Items: <span id="cache-size" class="font-medium">0</span></span>
-        </div>
-        <button class="button button-secondary" id="clear-btn">
-          <svg class="icon" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 6h18" />
-            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-          </svg>
-          Empty Cache
-        </button>
-      </div>
+      <button class="button button-secondary" id="clear-btn" style="width: 100%;">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18" />
+          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+        </svg>
+        Empty Cache
+      </button>
     </div>
   </div>
 
@@ -408,6 +411,13 @@
         <label class="label" for="token-input">Personal Access Token</label>
         <input type="password" id="token-input" class="input"
           placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+        <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--muted-foreground);">
+          Don't have a token?
+          <a href="https://github.com/settings/tokens/new?description=Pack-Man%20Extension&scopes=repo" target="_blank"
+            rel="noopener noreferrer" class="token-help-link">
+            Generate one here →
+          </a>
+        </div>
         <button class="button button-primary mt-4" id="save-token-btn" style="width: 100%;">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />

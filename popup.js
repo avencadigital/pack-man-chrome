@@ -1,3 +1,39 @@
+// ========== UI Utilities ==========
+class UIHelper {
+  static showStatus(elementId, message, type = 'info') {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    element.textContent = message;
+    element.style.color = this.getStatusColor(type);
+  }
+
+  static getStatusColor(type) {
+    const colors = {
+      success: 'green',
+      error: 'var(--destructive)',
+      info: 'var(--muted-foreground)'
+    };
+    return colors[type] || colors.info;
+  }
+
+  static setButtonState(buttonId, disabled, text) {
+    const button = document.getElementById(buttonId);
+    if (!button) return;
+
+    button.disabled = disabled;
+    if (text) button.textContent = text;
+  }
+
+  static clearStatusAfterDelay(elementId, delay = 3000) {
+    setTimeout(() => {
+      const element = document.getElementById(elementId);
+      if (element) element.textContent = '';
+    }, delay);
+  }
+}
+
+// ========== Main Popup Manager ==========
 class PopupManager {
   constructor() {
     this.init();
@@ -7,78 +43,63 @@ class PopupManager {
     this.loadToken();
     this.loadApiEndpoint();
     this.setupEventListeners();
-    this.updateCacheStats();
-  }
-
-  async updateCacheStats() {
-    try {
-      const response = await chrome.runtime.sendMessage({ action: 'getCacheStats' });
-      if (response && response.success) {
-        document.getElementById('cache-size').textContent = response.stats.size;
-      }
-    } catch (error) {
-      document.getElementById('cache-size').textContent = 'N/A';
-    }
   }
 
   setupEventListeners() {
     document.getElementById('clear-btn').addEventListener('click', async () => {
       await chrome.runtime.sendMessage({ action: 'clearCache' });
-      this.updateCacheStats();
     });
 
     document.getElementById('save-token-btn').addEventListener('click', () => this.handleSaveToken());
     document.getElementById('remove-token-btn').addEventListener('click', () => this.handleRemoveToken());
-
     document.getElementById('save-api-btn').addEventListener('click', () => this.handleSaveApiEndpoint());
     document.getElementById('reset-api-btn').addEventListener('click', () => this.handleResetApiEndpoint());
-
     document.getElementById('bmac-btn').addEventListener('click', () => this.handleBuyMeACoffee());
   }
 
+  // ========== Token Management ==========
+
   async handleSaveToken() {
-    const tokenInput = document.getElementById('token-input');
-    const saveButton = document.getElementById('save-token-btn');
-    const tokenStatus = document.getElementById('token-status');
-    const token = tokenInput.value.trim();
+    const token = document.getElementById('token-input').value.trim();
 
     if (!token) {
-      tokenStatus.textContent = 'Please enter a token.';
-      tokenStatus.style.color = 'var(--destructive)';
+      UIHelper.showStatus('token-status', 'Please enter a token.', 'error');
       return;
     }
 
-    saveButton.disabled = true;
-    saveButton.textContent = 'Validating...';
-    tokenStatus.textContent = '';
+    UIHelper.setButtonState('save-token-btn', true, 'Validating...');
+    UIHelper.showStatus('token-status', '', 'info');
 
     try {
-      const response = await chrome.runtime.sendMessage({ action: 'validateToken', token: token });
+      const response = await chrome.runtime.sendMessage({ action: 'validateToken', token });
+
       if (response.success && response.data.valid) {
+        // Use callback pattern (original working code)
         chrome.storage.local.set({ github_token: token }, () => {
-          this.updateTokenDisplay(token);
-          tokenStatus.textContent = `Valid token! Hello, ${response.data.user.login}.`;
-          tokenStatus.style.color = 'green';
+          if (chrome.runtime.lastError) {
+            console.error('Error saving token:', chrome.runtime.lastError);
+            UIHelper.showStatus('token-status', 'Failed to save token', 'error');
+          } else {
+            this.updateTokenDisplay(token);
+            UIHelper.showStatus('token-status', `Valid token! Hello, ${response.data.user.login}.`, 'success');
+          }
+          UIHelper.setButtonState('save-token-btn', false, 'Save Token');
         });
+        return; // Exit early, callback will handle the rest
       } else {
         throw new Error(response.data.error || 'Invalid token.');
       }
     } catch (error) {
-      tokenStatus.textContent = error.message;
-      tokenStatus.style.color = 'var(--destructive)';
-    } finally {
-      saveButton.disabled = false;
-      saveButton.textContent = 'Save Token';
+      UIHelper.showStatus('token-status', error.message, 'error');
+      UIHelper.setButtonState('save-token-btn', false, 'Save Token');
     }
   }
 
   handleRemoveToken() {
     chrome.storage.local.remove('github_token', () => {
       this.updateTokenDisplay(null);
-      const tokenStatus = document.getElementById('token-status');
-      tokenStatus.textContent = 'Token removed.';
-      tokenStatus.style.color = 'green';
-      setTimeout(() => tokenStatus.textContent = '', 3000);
+      UIHelper.showStatus('token-status', 'Token removed.', 'success');
+      UIHelper.clearStatusAfterDelay('token-status');
     });
   }
 
@@ -88,7 +109,7 @@ class PopupManager {
     const tokenInput = document.getElementById('token-input');
 
     if (token) {
-      document.getElementById('token-masked').textContent = 'ghp_...' + token.slice(-4);
+      document.getElementById('token-masked').textContent = `ghp_...${token.slice(-4)}`;
       tokenDisplay.style.display = 'block';
       tokenInputSection.style.display = 'none';
     } else {
@@ -109,10 +130,12 @@ class PopupManager {
     });
   }
 
+  // ========== API Endpoint Management ==========
+
   async loadApiEndpoint() {
     try {
       const response = await chrome.runtime.sendMessage({ action: 'getApiEndpoint' });
-      if (response && response.success) {
+      if (response?.success) {
         this.updateApiEndpointDisplay(response.endpoint, response.isDefault);
       }
     } catch (error) {
@@ -122,7 +145,6 @@ class PopupManager {
 
   updateApiEndpointDisplay(endpoint, isDefault) {
     const apiInput = document.getElementById('api-endpoint-input');
-    const apiStatus = document.getElementById('api-status');
     const resetBtn = document.getElementById('reset-api-btn');
 
     if (apiInput) {
@@ -131,88 +153,62 @@ class PopupManager {
     }
 
     if (isDefault) {
-      apiStatus.textContent = 'Using default API endpoint';
-      apiStatus.style.color = 'var(--muted-foreground)';
+      UIHelper.showStatus('api-status', 'Using default API endpoint', 'info');
       if (resetBtn) resetBtn.disabled = true;
     } else {
-      apiStatus.textContent = 'Using custom API endpoint';
-      apiStatus.style.color = 'var(--success)';
+      UIHelper.showStatus('api-status', 'Using custom API endpoint', 'success');
       if (resetBtn) resetBtn.disabled = false;
     }
   }
 
   async handleSaveApiEndpoint() {
-    const apiInput = document.getElementById('api-endpoint-input');
-    const saveButton = document.getElementById('save-api-btn');
-    const apiStatus = document.getElementById('api-status');
-    const endpoint = apiInput.value.trim();
+    const endpoint = document.getElementById('api-endpoint-input').value.trim();
 
     if (!endpoint) {
-      apiStatus.textContent = 'Please enter an API endpoint.';
-      apiStatus.style.color = 'var(--destructive)';
+      UIHelper.showStatus('api-status', 'Please enter an API endpoint.', 'error');
       return;
     }
 
-    saveButton.disabled = true;
-    saveButton.textContent = 'Validating...';
-    apiStatus.textContent = 'Testing API endpoint...';
-    apiStatus.style.color = 'var(--muted-foreground)';
+    UIHelper.setButtonState('save-api-btn', true, 'Validating...');
+    UIHelper.showStatus('api-status', 'Testing API endpoint...', 'info');
 
     try {
-      // Validate endpoint first
       const validationResponse = await chrome.runtime.sendMessage({
         action: 'validateApiEndpoint',
-        endpoint: endpoint
+        endpoint
       });
 
       if (validationResponse.success && validationResponse.data.valid) {
-        // Save if valid
-        await chrome.runtime.sendMessage({
-          action: 'setApiEndpoint',
-          endpoint: endpoint
-        });
-
-        apiStatus.textContent = 'API endpoint saved and validated successfully!';
-        apiStatus.style.color = 'var(--success)';
-
-        // Reload to update display
+        await chrome.runtime.sendMessage({ action: 'setApiEndpoint', endpoint });
+        UIHelper.showStatus('api-status', 'API endpoint saved and validated successfully!', 'success');
         setTimeout(() => this.loadApiEndpoint(), 1000);
       } else {
         throw new Error(validationResponse.data.error || 'API validation failed');
       }
     } catch (error) {
-      apiStatus.textContent = `Error: ${error.message}`;
-      apiStatus.style.color = 'var(--destructive)';
+      UIHelper.showStatus('api-status', `Error: ${error.message}`, 'error');
     } finally {
-      saveButton.disabled = false;
-      saveButton.textContent = 'Save & Test';
+      UIHelper.setButtonState('save-api-btn', false, 'Save & Test');
     }
   }
 
   async handleResetApiEndpoint() {
-    const resetButton = document.getElementById('reset-api-btn');
-    const apiStatus = document.getElementById('api-status');
-
-    resetButton.disabled = true;
-    apiStatus.textContent = 'Resetting to default...';
-    apiStatus.style.color = 'var(--muted-foreground)';
+    UIHelper.setButtonState('reset-api-btn', true);
+    UIHelper.showStatus('api-status', 'Resetting to default...', 'info');
 
     try {
       await chrome.runtime.sendMessage({ action: 'resetApiEndpoint' });
-      apiStatus.textContent = 'Reset to default API endpoint';
-      apiStatus.style.color = 'var(--success)';
-
-      // Reload to update display
+      UIHelper.showStatus('api-status', 'Reset to default API endpoint', 'success');
       setTimeout(() => this.loadApiEndpoint(), 500);
     } catch (error) {
-      apiStatus.textContent = `Error: ${error.message}`;
-      apiStatus.style.color = 'var(--destructive)';
-      resetButton.disabled = false;
+      UIHelper.showStatus('api-status', `Error: ${error.message}`, 'error');
+      UIHelper.setButtonState('reset-api-btn', false);
     }
   }
 
+  // ========== External Actions ==========
+
   handleBuyMeACoffee() {
-    // Open Buy Me a Coffee page in new tab
     chrome.tabs.create({ url: 'https://www.buymeacoffee.com/avenca.digital' });
   }
 }
